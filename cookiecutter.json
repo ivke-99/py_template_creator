@@ -1,0 +1,9 @@
+{
+	"project_slug": "Project slug",
+	"project_name": "Project Name",
+	"app_name": "App name",
+	"app_description": "description",
+	"author_name": "Ivan Djuraki",
+	"author_email": "ivandjuraki@protonmail.com",
+	"version_table_name": "migrations-table"
+}
