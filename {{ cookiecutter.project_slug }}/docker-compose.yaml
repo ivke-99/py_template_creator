@@ -6,7 +6,7 @@ networks:
 
 
 services:
-  maticar:
+  {{cookiecutter.project_name}}:
     build:
       context: ./{{cookiecutter.project_name}}/
       args:
@@ -27,7 +27,7 @@ services:
       - MYSQL_PORT
       - REDIS_HOST
     networks:
-      maticar:
+      {{cookiecutter.project_name}}:
         aliases:
           - app
     ports:
@@ -50,7 +50,7 @@ services:
       - mysqlDB:/var/lib/mysql
       - ./init_db:/docker-entrypoint-initdb.d
     networks:
-      maticar:
+      {{cookiecutter.project_name}}:
         aliases:
         - ${MYSQL_HOST}
     healthcheck:
@@ -69,7 +69,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      maticar:
+      {{cookiecutter.project_name}}:
         aliases:
         - ${REDIS_HOST}
     healthcheck:
