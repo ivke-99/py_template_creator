@@ -31,6 +31,7 @@ setup(
     version=find_version("py_template_creator", "__init__.py"),
     description="Python package for project creation",
     long_description=long_description,
+    url="https://github.com/ivke-99/py_template_creator",
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["doc"]),
     include_package_data=True,
