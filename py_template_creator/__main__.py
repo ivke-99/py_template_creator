@@ -1,3 +1,4 @@
+import os
 from cookiecutter.main import cookiecutter
 
 
@@ -15,7 +16,14 @@ def main():
             print("Wrong id.")
         else:
             break
-    cookiecutter(available_templates[choice])
+
+    cookiecutter(
+        template=available_templates[choice],
+        directory=os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            available_templates[choice]
+        )
+    )
 
 
 if __name__ == '__main__':
