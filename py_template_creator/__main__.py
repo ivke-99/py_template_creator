@@ -1,9 +1,8 @@
-import os
 from cookiecutter.main import cookiecutter
 
 
 def main():
-    available_templates = next(os.walk('.'))[1]
+    available_templates = ["api-scelet", "service-scelet"]
     for i, template in enumerate(available_templates):
         print(f"ID: {i} -- Name: {template}")
     while True:
