@@ -1,16 +1,52 @@
-# FastAPI Template Generator
 
-FastAPI service-oriented pattern generator.
+  
+
+# Py Template Creator
+
+Py Template Creator is a pip package providing an easy way to jump-start a project or a micro-service.
 
 ## Installation
 
-```bash
-git clone git@git.nosolutions.rs:skeleton/fast-api.git
-cd repo_folder_name
-mkvirtualenv your_desired_name
-workon your_desired_name
-pip install cookiecutter
-cookiecutter .
-```
+  
 
-This will generate the project in your current directory. Feel free to move it anywhere else afterwards.
+The project requires cookiecutter installed.
+
+  
+
+Install with pip
+
+  
+
+```pip install py_template_generator```
+
+## Templates
+
+  
+
+- FastAPI monolith skeleton
+
+- Service skeleton
+  
+  
+
+## Usage
+
+Template generator will create the template in the current directory.
+
+
+```py_template_generator```
+
+  
+## Authors
+
+  
+
+- [@ivke-99](https://www.github.com/ivke-99)
+  
+  
+
+## Contributing
+
+  
+
+Contributions are always welcome! :)
