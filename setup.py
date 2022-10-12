@@ -42,6 +42,7 @@ setup(
     entry_points={'console_scripts': ['py_template_creator = py_template_creator.__main__:main']},
     install_requires=[
         "cookiecutter",
+        "mrkutil"
     ],
     classifiers=[
         'Environment :: Web Environment',

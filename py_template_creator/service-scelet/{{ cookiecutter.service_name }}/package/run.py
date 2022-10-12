@@ -1,5 +1,5 @@
-from common_util.communication import listen
-from common_util.logging import get_logging_config
+from mrkutil.communication import listen
+from mrkutil.logging import get_logging_config
 from package.app import handlers  # noqa importing handlers
 
 import os

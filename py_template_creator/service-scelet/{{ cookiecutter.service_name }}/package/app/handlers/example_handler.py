@@ -1,5 +1,5 @@
-from common_util.responses import ResponseHelper
-from common_util.base import BaseHandler
+from mrkutil.responses import ResponseHelper
+from mrkutil.base import BaseHandler
 import logging
 
 logger = logging.getLogger(__name__)
