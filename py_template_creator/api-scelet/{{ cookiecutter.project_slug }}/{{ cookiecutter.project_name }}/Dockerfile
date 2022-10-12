@@ -10,7 +10,6 @@ ENV APP_VERSION=$APP_VERSION
 
 WORKDIR /wheels
 COPY ./$APP_DIR/requirements/ /wheels/requirements/
-COPY ./common_package /wheels/common_package
 RUN pip install -U pip && pip wheel -r ./requirements/prod.txt
 
 # Stage 1, no dev packages on wheels
@@ -21,12 +20,10 @@ ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 
 COPY --from=builder /wheels /wheels
-COPY --from=builder /wheels/common_package /common_package
 RUN pip install -U pip \
        && pip install -r /wheels/requirements/prod.txt \
                       -f /wheels \
        && rm -rf /wheels \
-       && rm -rf /common_package \
        && rm -rf /root/.cache/pip/*
 
 
