@@ -1,0 +1,2 @@
+recursive-include py_template_creator/api-scelet *
+recursive-include py_template_creator/service-scelet *
