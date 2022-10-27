@@ -23,7 +23,7 @@ def main():
     """
     try:
         pid = str(os.getpid())
-        pidfile = "./running/service.pid"
+        pidfile = "/tmp/service.pid"
 
         if os.path.isfile(pidfile):
             logger.warning("Service is already running")
