@@ -23,7 +23,7 @@ def main():
     """
     try:
         pid = str(os.getpid())
-        pidfile = "/tmp/service.pid"
+        pidfile = "/tmp/service_{{ cookiecutter.service_name }}.pid"
 
         if os.path.isfile(pidfile):
             logger.warning("Service is already running")
