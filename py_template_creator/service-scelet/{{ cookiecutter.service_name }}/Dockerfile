@@ -30,7 +30,6 @@ RUN pip install -U pip \
 # Copy code to docker
 COPY ./$APP_DIR/ /opt/app/
 COPY ./$APP_DIR/config/ /opt/app/config/
-RUN mkdir -p /opt/app/running
 WORKDIR /opt/app
 RUN python setup.py install
 # Collect our static media.
