@@ -1,8 +1,8 @@
-ARG PYTHON_VERSION=3.10-slim
+ARG PYTHON_VERSION=3.11-slim
 
 # Stage 0, instaling dev packages
 FROM python:${PYTHON_VERSION} as builder
-LABEL maintainer="Nebojsa Mrkic <mrkic.nebojsa@gmail.com>"
+LABEL maintainer="{{ cookiecutter.author_name }} <{{ cookiecutter.author_email }}>"
 ENV PYTHONUNBUFFERED 1
 ARG APP_DIR
 ARG APP_VERSION
@@ -30,7 +30,7 @@ RUN pip install -U pip \
 # Copy code to docker
 COPY ./$APP_DIR/ /opt/app/
 COPY ./$APP_DIR/config/ /opt/app/config/
-RUN mkdir -p /opt/app/running
+COPY ./$APP_DIR/migrations/ /opt/app/migrations/
 WORKDIR /opt/app
 RUN python setup.py install
 # Collect our static media.

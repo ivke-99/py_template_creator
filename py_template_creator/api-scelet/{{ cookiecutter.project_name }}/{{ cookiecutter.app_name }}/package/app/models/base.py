@@ -44,14 +44,7 @@ try:
 except Exception as e:
     logger.debug("Error creating test db. Exception: {}".format(str(e)))
 
-
-def metadata_dump(sql, *multiparams, **params):
-    # print or write to log or file etc
-    print(sql.compile(dialect=engine.dialect))
-
-
 engine = create_engine(db_url, pool_pre_ping=True, poolclass=NullPool)
-# engine = create_engine(db_url, strategy='mock', executor=metadata_dump)
 Session = sessionmaker(autocommit=False, autoflush=True, bind=engine)
 
 Base = declarative_base()

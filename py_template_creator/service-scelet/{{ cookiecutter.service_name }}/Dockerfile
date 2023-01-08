@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.10-slim
+ARG PYTHON_VERSION=3.11-slim
 
 # Stage 0, instaling dev packages
 FROM python:${PYTHON_VERSION} as builder

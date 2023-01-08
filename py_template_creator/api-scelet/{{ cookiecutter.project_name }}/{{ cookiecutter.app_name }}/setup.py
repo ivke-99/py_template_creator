@@ -15,34 +15,21 @@ with open(path.join(here, "README.md")) as f:
 setup(
     name="{{cookiecutter.app_name}}",
     version=getenv("APP_VERSION", "0.0.0"),
-
     description="{{cookiecutter.app_description}}",
     long_description=long_description,
-    url="",
-
     packages=find_packages(exclude=["doc"]),
-
     # source code layout
-    namespace_packages=["{{cookiecutter.app_name}}"],
+    namespace_packages=["package"],
 
     # Generating the command-line tool
     entry_points={
         "console_scripts": [
-            "{{cookiecutter.app_name}}={{cookiecutter.app_name}}.run:prod"
+            "{{ cookiecutter.app_name }}=package.run:prod"
         ]
     },
-
     # author and license
     author="{{cookiecutter.author_name}}",
     author_email="{{cookiecutter.author_email}}",
-    # license="",
-
-    # dependencies, a list of rules
-    install_requires=["overrides>=1.8"],
-    # add links to repositories if modules are not on pypi
-    dependency_links=[
-    ],
-
     #  PyTest integration
     setup_requires=["pytest-runner"],
     tests_require=["pytest", "mock"]

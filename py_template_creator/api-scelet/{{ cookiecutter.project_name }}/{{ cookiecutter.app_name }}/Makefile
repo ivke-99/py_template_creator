@@ -3,15 +3,15 @@ include ../.env
 export
 
 env:
-	pip install -r requirements/test.txt  > /dev/null
+	pip install -r requirements/local.txt  > /dev/null
 
 run:
 	@echo "Running service..."
-	python {{cookiecutter.app_name}}/run.py
+	python package/run.py
 
 test:
 	@echo "Running unit tests..."
-	env TEST_DB=True coverage run --source={{cookiecutter.app_name}} setup.py test ${module} && \
+	env TEST_DB=True coverage run --source=package setup.py test ${module} && \
 	coverage html && \
 	coverage report
 	@echo
@@ -25,17 +25,26 @@ test:
 lint:
 	@python -m flake8 --max-line-length=180 --exclude .git,__pycache__,.eggs,build
 
+generate-migrations:
+	@echo "Generating migrations ..."
+	alembic revision --autogenerate -m "${message}"
+
 migrate:
 	@echo "Running migrations ..."
-	python {{cookiecutter.app_name}}/migrations/manage.py upgrade
+	alembic upgrade head
 	@echo "Migrations finished."
 
 downgrade:
-	@echo "Running migrations ..."
-	python {{cookiecutter.app_name}}/migrations/manage.py downgrade ${level}
+	@echo "Running downgrade ..."
+	alembic downgrade ${level}
 	@echo "Migrations finished."
 
 init_db:
-	@echo "Running migrations ..."
-	python {{cookiecutter.app_name}}/migrations/manage.py version_control
+	@echo "Initing database ..."
+	alembic ensure_version
+	@echo "Migrations finished."
+
+check_db:
+	@echo "Checking migrations ..."
+	alembic check
 	@echo "Migrations finished."

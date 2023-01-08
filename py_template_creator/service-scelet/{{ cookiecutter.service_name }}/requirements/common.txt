@@ -1,3 +1,2 @@
-RabbitMQPubSub==0.1.5
 watchfiles==0.18.0
-mrkutil
+mrkutil==1.0.6

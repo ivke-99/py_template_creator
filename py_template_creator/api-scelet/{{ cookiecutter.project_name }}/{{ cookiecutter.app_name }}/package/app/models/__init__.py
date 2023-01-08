@@ -3,6 +3,7 @@ from .base import (
     engine,
     Base,
     get_db,
+    db_url
 
 )
 
@@ -11,4 +12,8 @@ __all__ = [
     "engine",
     "Base",
     "get_db",
+    "db_url"
 ]
+
+# Import models here that alembic should generate migrations for
+auto_migrate = []
