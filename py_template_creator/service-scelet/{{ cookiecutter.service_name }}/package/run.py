@@ -23,8 +23,6 @@ def main():
     """
     try:
         pid = str(os.getpid())
-
-        pid = str(os.getpid())
         if not os.path.isdir("/tmp/service"):
             os.makedirs("/tmp/service")
         pidfile = "/tmp/service_{{ cookiecutter.service_name }}.pid"
