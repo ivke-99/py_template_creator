@@ -1,3 +1,5 @@
 {
-	"service_name": "Service name"
+	"service_name": "Service name",
+	"author_name": "Ivan Djuraki",
+	"author_email": "ivandjuraki@protonmail.com"
 }

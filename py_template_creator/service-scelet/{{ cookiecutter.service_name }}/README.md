@@ -5,7 +5,7 @@
 - create virtualenv with virtualenv wrapper
 ```
 cd {{ cookiecutter.service_name }}
-mkvirtualenv <env name> --python=/path/to/python/executable/python3.10.*
+mkvirtualenv <env name> --python=/path/to/python/executable/python3.12.*
 ```
 
 - install packages needed for the project

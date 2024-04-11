@@ -1,4 +1,4 @@
-from mrkutil.responses import ResponseHelper
+from mrkutil.responses import ServiceResponse
 from mrkutil.base import BaseHandler
 import logging
 
@@ -14,4 +14,4 @@ class ExampleHandler(BaseHandler):
     def process(self, data, corr_id):
         self.data = data.get("request", None)
         logger.info("Handle example")
-        return ResponseHelper.get_response(200, f"example response from service with request data={data}")
+        return ServiceResponse(200, f"example response from service with request data={self.data}")

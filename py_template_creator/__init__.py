@@ -1,7 +1,5 @@
 """
-Py template creator namespace
+Generate your python project template with ease.
 """
 
-__version__ = "1.1.3"
-
-__import__("pkg_resources").declare_namespace(__name__)
+__version__ = "1.2.0"

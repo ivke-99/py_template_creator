@@ -1,0 +1,17 @@
+[project]
+name = "{{ cookiecutter.service_name }}"
+version = "0.0.0"
+description = "Service python application"
+readme = "README.md"
+authors = [{ name = "{{ cookiecutter.author_name }}", email = "{{ cookiecutter.author_email }}" }]
+
+[project.scripts]
+{{ cookiecutter.service_name }} = "package.run:main"
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = ["pragma: no cover"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
