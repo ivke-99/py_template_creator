@@ -2,7 +2,7 @@ import asyncio
 from logging.config import fileConfig
 
 from alembic import context
-from app.models.base import Base, DB_URL
+from package.app.models.base import Base, DB_URL
 from psycopg.connection_async import AsyncConnection as Connection
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config

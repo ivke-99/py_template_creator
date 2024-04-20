@@ -6,9 +6,9 @@ from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alembic.script import ScriptDirectory
-from app.models import Base, get_db_session
-from app.models.base import DatabaseSessionManager
-from app.main import app as actual_app
+from package.app.models import Base, get_db_session
+from package.app.models.base import DatabaseSessionManager
+from package.app.main import app as actual_app
 from psycopg.connection_async import AsyncConnection as Connection
 
 from fastapi.testclient import TestClient
@@ -40,8 +40,8 @@ def client(event_loop, app):
 
 
 def run_migrations(connection: Connection):
-    config = Config("app/alembic.ini")
-    config.set_main_option("script_location", "app/alembic")
+    config = Config("package/alembic.ini")
+    config.set_main_option("script_location", "package/app/alembic")
     config.set_main_option("sqlalchemy.url", DB_URL)
     script = ScriptDirectory.from_config(config)
 

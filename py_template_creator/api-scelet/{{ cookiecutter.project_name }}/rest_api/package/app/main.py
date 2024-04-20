@@ -5,11 +5,11 @@ import uvicorn
 from fastapi.middleware import Middleware
 from contextlib import asynccontextmanager
 from starlette.middleware.cors import CORSMiddleware
-from app.models import (
+from package.app.models import (
     sessionmanager,
     get_db_session,
 )
-from app import api as a_app
+from package.app import api as a_app
 from fastapi import FastAPI
 from mrkutil.logging import get_logging_config
 
@@ -66,7 +66,7 @@ for name, obj in inspect.getmembers(a_app):
 
 def dev():
     uvicorn.run(
-        "app.main:app",
+        "package.app.main:app",
         host="0.0.0.0",
         port=8080,
         reload=True,
@@ -77,7 +77,7 @@ def dev():
 
 def prod():
     uvicorn.run(
-        "app.main:app",
+        "package.app.main:app",
         headers=[
             ("server", "Apache"),
             ("X-Frame-Options", "SAMEORIGIN"),

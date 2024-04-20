@@ -198,5 +198,5 @@ yarn-error.log*
 
 # Sublime files
 *.sublime*
-!.env
-!env.sh
+# !.env
+# !env.sh

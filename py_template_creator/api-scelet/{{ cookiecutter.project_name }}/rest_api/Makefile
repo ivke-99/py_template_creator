@@ -7,7 +7,7 @@ env:
 
 run:
 	@echo "Running service..."
-	python app/main.py
+	python package/app/main.py
 
 test:
 	@echo "Running unit tests..."
@@ -27,24 +27,24 @@ lint:
 
 migrations:
 	@echo "Generating migrations ..."
-	alembic revision --autogenerate -m "${message}"
+	alembic -c ./package/alembic.ini revision --autogenerate -m "${message}"
 
 migrate:
 	@echo "Running migrations ..."
-	alembic upgrade head
+	alembic -c ./package/alembic.ini upgrade head
 	@echo "Migrations finished."
 
 downgrade:
 	@echo "Running downgrade ..."
-	alembic downgrade ${level}
+	alembic -c ./package/alembic.ini downgrade ${level}
 	@echo "Migrations finished."
 
 init_db:
 	@echo "Initing database ..."
-	alembic ensure_version
+	alembic -c ./package/alembic.ini ensure_version
 	@echo "Migrations finished."
 
 check_db:
 	@echo "Checking migrations ..."
-	alembic check
+	alembic -c ./package/alembic.ini check
 	@echo "Migrations finished."
