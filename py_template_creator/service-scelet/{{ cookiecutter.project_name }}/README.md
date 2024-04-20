@@ -1,10 +1,10 @@
-# {{ cookiecutter.service_name }} service
+# {{ cookiecutter.project_name }} service
 
 ## Setup service
 
 - create virtualenv with virtualenv wrapper
 ```
-cd {{ cookiecutter.service_name }}
+cd {{ cookiecutter.project_name }}
 mkvirtualenv <env name> --python=/path/to/python/executable/python3.12.*
 ```
 
@@ -19,12 +19,12 @@ make env
 - stop docker container for this service
 ```
 cd <project root>
-docker-compose stop {{ cookiecutter.service_name }}
+docker-compose stop {{ cookiecutter.project_name }}
 ```
 
 - start service from virtual environment
 ```
-cd {{ cookiecutter.service_name }}
+cd {{ cookiecutter.project_name }}
 workon <env name>
 make run
 ```
@@ -34,7 +34,7 @@ make run
 
 - tests are run on virtual environment
 ```
-cd {{ cookiecutter.service_name }}
+cd {{ cookiecutter.project_name }}
 workon <env name>
 ```
 

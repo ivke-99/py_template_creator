@@ -1,4 +1,0 @@
--r common.txt
-
-coverage==7.4.1
-flake8==6.1.0

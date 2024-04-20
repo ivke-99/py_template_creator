@@ -5,6 +5,7 @@ FROM python:${PYTHON_VERSION} as builder
 LABEL maintainer="{{cookiecutter.author_name}} <{{cookiecutter.author_email}}>"
 ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update && apt-get -y install build-essential libpq-dev
 WORKDIR /wheels
 COPY ./$APP_DIR/requirements/ /wheels/requirements/
 RUN pip install -U pip && pip wheel -r ./requirements/prod.txt

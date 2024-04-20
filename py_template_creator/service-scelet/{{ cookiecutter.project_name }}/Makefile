@@ -3,15 +3,15 @@ include ../.env
 export
 
 env:
-	pip install -r requirements/local.txt
+	pip install -r requirements/local.txt  > /dev/null
 
 run:
 	@echo "Running service..."
-	python package/app/main.py
+	python package/run.py
 
 test:
 	@echo "Running unit tests..."
-	coverage run -m pytest ${module} && \
+	env POSTGRES_DB=test_db coverage run -m pytest ${module} && \
 	coverage html && \
 	coverage report
 	@echo

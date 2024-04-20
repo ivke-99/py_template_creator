@@ -25,7 +25,7 @@ def main():
         pid = str(os.getpid())
         if not os.path.isdir("/tmp/service"):
             os.makedirs("/tmp/service")
-        pidfile = "/tmp/service_{{ cookiecutter.service_name }}.pid"
+        pidfile = "/tmp/service_{{ cookiecutter.project_name }}.pid"
         if os.path.isfile(pidfile):
             logger.warning("Service is already running")
             sys.exit(1)
@@ -35,9 +35,9 @@ def main():
         try:
             logger.info("Starting ...")
             listen(
-                exchange=os.getenv("EXCHANGE_{{ cookiecutter.service_name.upper() }}"),
-                exchange_type=os.getenv("EXCHANGE_TYPE_{{ cookiecutter.service_name.upper() }}"),
-                queue=os.getenv("QUEUE_{{ cookiecutter.service_name.upper() }}"),
+                exchange=os.getenv("EXCHANGE_{{ cookiecutter.project_name.upper() }}"),
+                exchange_type=os.getenv("EXCHANGE_TYPE_{{ cookiecutter.project_name.upper() }}"),
+                queue=os.getenv("QUEUE_{{ cookiecutter.project_name.upper() }}"),
             )
             sys.exit(0)
         finally:

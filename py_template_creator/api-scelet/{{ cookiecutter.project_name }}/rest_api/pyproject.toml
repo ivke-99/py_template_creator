@@ -15,7 +15,7 @@ rest_api = "package.app.main:prod"
 
 [tool.coverage.run]
 source = ["./"]
-omit = ["package/app/main.py", "package/app/database.py", "package/app/alembic/*"]
+omit = ["package/app/main.py", "package/app/models/base.py", "package/app/alembic/*"]
 
 [tool.coverage.report]
 fail_under = 80
