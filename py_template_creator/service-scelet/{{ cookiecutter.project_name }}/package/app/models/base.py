@@ -21,8 +21,6 @@ logger.info(f"Connecting with conn string {DB_URL}")
 engine = create_engine(DB_URL, pool_pre_ping=True, poolclass=NullPool)
 Session = sessionmaker(autocommit=False, autoflush=True, bind=engine)
 
-Base = declarative_base()
-
 
 def get_db_session():
     try:
