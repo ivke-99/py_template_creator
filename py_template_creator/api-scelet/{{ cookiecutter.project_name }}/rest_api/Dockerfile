@@ -30,6 +30,7 @@ COPY ./config /opt/app/config
 
 # Ensuring script permissions
 RUN chmod +x /opt/app/config/run.sh
+RUN chmod +x /opt/app/config/test.sh
 
 RUN pip install -e .
 

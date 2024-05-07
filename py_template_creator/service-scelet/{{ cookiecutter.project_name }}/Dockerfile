@@ -23,10 +23,16 @@ RUN pip install -U pip \
 
 
 # Copy code to docker
-COPY ./ /opt/app/
-COPY ./config/ /opt/app/config/
 WORKDIR /opt/app
-RUN python -m pip install .
+
+COPY ./ /opt/app/
+COPY ./config /opt/app/config
+
+# Ensuring script permissions
+RUN chmod +x /opt/app/config/run.sh
+RUN chmod +x /opt/app/config/test.sh
+
+RUN pip install -e .
 
 # Specify the command to run when the image is run.
 CMD "/opt/app/config/run.sh"

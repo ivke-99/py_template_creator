@@ -13,7 +13,7 @@ packages = ["package"]
 
 [tool.coverage.run]
 source = ["./"]
-omit = ["package/app/run.py", "package/app/models/base.py", "package/app/alembic/*"]
+omit = ["package/run.py", "package/app/models/base.py", "package/app/alembic/*"]
 
 [tool.coverage.report]
 fail_under = 80
