@@ -11,11 +11,19 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy import inspect
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+from sqlalchemy import inspect, Identity, BigInteger
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    MappedAsDataclass,
+    Mapped,
+    mapped_column,
+)
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
+    id: Mapped[int] = mapped_column(
+        BigInteger, Identity(always=True), init=False, primary_key=True
+    )
     """subclasses will be converted to dataclasses"""
 
     def to_dict(self, recurse: bool = True, force_exclude: list = []) -> dict:

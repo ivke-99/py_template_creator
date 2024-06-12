@@ -3,11 +3,20 @@ import os
 import enum
 import uuid
 
-from sqlalchemy import create_engine, NullPool, inspect
-from sqlalchemy.orm import DeclarativeBase, sessionmaker, MappedAsDataclass
+from sqlalchemy import create_engine, NullPool, inspect, Identity, BigInteger
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    sessionmaker,
+    MappedAsDataclass,
+    Mapped,
+    mapped_column,
+)
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
+    id: Mapped[int] = mapped_column(
+        BigInteger, Identity(always=True), init=False, primary_key=True
+    )
     """subclasses will be converted to dataclasses"""
 
     def to_dict(self, recurse: bool = True, force_exclude: list = []) -> dict:
