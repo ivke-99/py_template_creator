@@ -2,21 +2,20 @@ import os
 from contextlib import ExitStack
 
 import pytest
+import json
 from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alembic.script import ScriptDirectory
-from package.app.models import Base, get_db_session
-from package.app.models.base import DatabaseSessionManager
-from package.app.main import app as actual_app
+from app.models import Base, get_db_session
+from app.models.base import DatabaseSessionManager
+from app.main import app as actual_app
 from psycopg.connection_async import AsyncConnection as Connection
 
 from fastapi.testclient import TestClient
 from sqlalchemy.pool import NullPool
-from sqlalchemy.ext.asyncio import (
-    create_async_engine,
-)
-from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine, close_all_sessions
+from sqlalchemy import text, inspect, create_engine
 
 DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
     os.getenv("POSTGRES_USER"),
@@ -40,8 +39,8 @@ def client(event_loop, app):
 
 
 def run_migrations(connection: Connection):
-    config = Config("package/alembic.ini")
-    config.set_main_option("script_location", "package/app/alembic")
+    config = Config("app/alembic.ini")
+    config.set_main_option("script_location", "app/alembic")
     config.set_main_option("sqlalchemy.url", DB_URL)
     script = ScriptDirectory.from_config(config)
 
@@ -57,12 +56,12 @@ def run_migrations(connection: Connection):
             context.run_migrations()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 async def sessionmanager():
     yield DatabaseSessionManager(DB_URL, {"poolclass": NullPool})
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 async def setup_database(sessionmanager):
     # Run alembic migrations on test DB
     ROOT_DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
@@ -74,6 +73,7 @@ async def setup_database(sessionmanager):
     )
     my_engine = create_async_engine(
         ROOT_DB_URL,
+        json_serializer=lambda obj: json.dumps(obj, default=str),
         echo=True,
         isolation_level="AUTOCOMMIT",
         poolclass=NullPool,
@@ -88,6 +88,37 @@ async def setup_database(sessionmanager):
 
     # Teardown
     await sessionmanager.close()
+
+
+def truncate_all_tables(engine):
+    inspector = inspect(engine)
+    with engine.connect() as conn:
+        conn.execute(text("SET session_replication_role = 'replica';"))
+        for table_name in inspector.get_table_names():
+            conn.execute(
+                text(f'TRUNCATE TABLE "{table_name}" RESTART IDENTITY CASCADE;')
+            )
+        conn.execute(text("SET session_replication_role = 'origin';"))
+
+
+@pytest.fixture(scope="function", autouse=True)
+async def drop_tables():
+    yield
+    await close_all_sessions()
+    TEST_DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
+        os.getenv("POSTGRES_USER"),
+        os.getenv("POSTGRES_PASSWORD"),
+        os.getenv("POSTGRES_HOST"),
+        os.getenv("POSTGRES_PORT"),
+        "test_db",
+    )
+    my_engine = create_engine(
+        TEST_DB_URL,
+        echo=False,
+        isolation_level="AUTOCOMMIT",
+        poolclass=NullPool,
+    )  # connect to server
+    truncate_all_tables(my_engine)
 
 
 # Each test function is a clean slate

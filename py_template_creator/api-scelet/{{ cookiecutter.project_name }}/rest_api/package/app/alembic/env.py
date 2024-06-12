@@ -19,6 +19,13 @@ fileConfig(config.config_file_name)  # type: ignore
 target_metadata = Base.metadata
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and reflected and compare_to is None:
+        return False
+    else:
+        return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
     This configures the context with just a URL
@@ -31,7 +38,8 @@ def run_migrations_offline():
     context.configure(
         url=DB_URL,
         target_metadata=target_metadata,
-        version_table="{{cookiecutter.project_name}}",
+        version_table="user",
+        include_object=include_object,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
@@ -44,6 +52,7 @@ def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
+        include_object=include_object,
         version_table="{{cookiecutter.project_name}}",
     )
 

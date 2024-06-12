@@ -1,14 +1,27 @@
 import os
 import pytest
+import contextlib
 from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alembic.script import ScriptDirectory
 
 from sqlalchemy.pool import NullPool
-from sqlalchemy import text, create_engine
+from sqlalchemy import text, create_engine, inspect
+from sqlalchemy.orm import close_all_sessions
 from package.app.models import Base
 from package.app.models.base import DB_URL
+
+
+def truncate_all_tables(engine):
+    inspector = inspect(engine)
+    with engine.connect() as conn:
+        conn.execute(text("SET session_replication_role = 'replica';"))
+        for table_name in inspector.get_table_names():
+            conn.execute(
+                text(f'TRUNCATE TABLE "{table_name}" RESTART IDENTITY CASCADE;')
+            )
+        conn.execute(text("SET session_replication_role = 'origin';"))
 
 
 def run_migrations(connection):
@@ -29,7 +42,7 @@ def run_migrations(connection):
             context.run_migrations()
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def setup_database():
     # Run alembic migrations on test DB
     ROOT_DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
@@ -41,19 +54,38 @@ def setup_database():
     )
     my_engine = create_engine(
         ROOT_DB_URL,
-        echo=True,
+        echo=False,
         isolation_level="AUTOCOMMIT",
         poolclass=NullPool,
     )  # connect to server
     with my_engine.connect() as conn:
-        conn.execute(text("DROP DATABASE IF EXISTS test_db;"))  # create db
-        conn.execute(text("CREATE DATABASE test_db;"))  # create db
+        conn.execute(text("DROP DATABASE IF EXISTS test_db;"))
+        conn.execute(text("CREATE DATABASE test_db;"))
     test_engine = create_engine(
         DB_URL,
-        echo=True,
+        echo=False,
         isolation_level="AUTOCOMMIT",
         poolclass=NullPool,
     )
-    with test_engine.connect() as conn:
+    with contextlib.closing(test_engine.connect()) as conn:
         run_migrations(connection=conn)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def drop_tables():
     yield
+    close_all_sessions()
+    TEST_DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
+        os.getenv("POSTGRES_USER"),
+        os.getenv("POSTGRES_PASSWORD"),
+        os.getenv("POSTGRES_HOST"),
+        os.getenv("POSTGRES_PORT"),
+        "test_db",
+    )
+    my_engine = create_engine(
+        TEST_DB_URL,
+        echo=False,
+        isolation_level="AUTOCOMMIT",
+        poolclass=NullPool,
+    )  # connect to server
+    truncate_all_tables(my_engine)
