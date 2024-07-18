@@ -1,4 +1,3 @@
-import os
 import pytest
 import contextlib
 from alembic.config import Config
@@ -9,6 +8,7 @@ from alembic.script import ScriptDirectory
 from sqlalchemy.pool import NullPool
 from sqlalchemy import text, create_engine, inspect
 from sqlalchemy.orm import close_all_sessions
+from package.app import settings
 from package.app.models import Base
 from package.app.models.base import DB_URL
 
@@ -46,10 +46,10 @@ def run_migrations(connection):
 def setup_database():
     # Run alembic migrations on test DB
     ROOT_DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
-        os.getenv("POSTGRES_USER"),
-        os.getenv("POSTGRES_PASSWORD"),
-        os.getenv("POSTGRES_HOST"),
-        os.getenv("POSTGRES_PORT"),
+        settings.POSTGRES_USER,
+        settings.POSTGRES_PASSWORD,
+        settings.POSTGRES_HOST,
+        settings.POSTGRES_PORT,
         "postgres",
     )
     my_engine = create_engine(
@@ -76,10 +76,10 @@ def drop_tables():
     yield
     close_all_sessions()
     TEST_DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
-        os.getenv("POSTGRES_USER"),
-        os.getenv("POSTGRES_PASSWORD"),
-        os.getenv("POSTGRES_HOST"),
-        os.getenv("POSTGRES_PORT"),
+        settings.POSTGRES_USER,
+        settings.POSTGRES_PASSWORD,
+        settings.POSTGRES_HOST,
+        settings.POSTGRES_PORT,
         "test_db",
     )
     my_engine = create_engine(

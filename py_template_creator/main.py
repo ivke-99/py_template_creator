@@ -20,11 +20,10 @@ def start():
     cookiecutter(
         template=available_templates[choice],
         directory=os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            available_templates[choice]
-        )
+            os.path.dirname(os.path.realpath(__file__)), available_templates[choice]
+        ),
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     start()

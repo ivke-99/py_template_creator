@@ -1,8 +1,8 @@
 import logging
-import os
 import enum
 import uuid
 
+from package.app import settings
 from sqlalchemy import create_engine, NullPool, inspect, Identity, BigInteger
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -61,11 +61,11 @@ class Base(MappedAsDataclass, DeclarativeBase):
 logger = logging.getLogger(__name__)
 
 DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
-    os.getenv("POSTGRES_USER"),
-    os.getenv("POSTGRES_PASSWORD"),
-    os.getenv("POSTGRES_HOST"),
-    os.getenv("POSTGRES_PORT"),
-    os.getenv("POSTGRES_DB"),
+    settings.POSTGRES_USER,
+    settings.POSTGRES_PASSWORD,
+    settings.POSTGRES_HOST,
+    settings.POSTGRES_PORT,
+    settings.POSTGRES_DB,
 )
 logger.info(f"Connecting with conn string {DB_URL}")
 

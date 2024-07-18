@@ -1,5 +1,3 @@
 from .example_handler import ExampleHandler
 
-__all__ = [
-    "ExampleHandler"
-]
+__all__ = ["ExampleHandler"]

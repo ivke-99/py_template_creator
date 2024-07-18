@@ -36,7 +36,7 @@ def run_migrations_offline():
     context.configure(
         url=DB_URL,
         target_metadata=target_metadata,
-        version_table="{{cookiecutter.project_name}}",
+        version_table="version_table_{{cookiecutter.project_name}}",
         include_object=include_object,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -49,7 +49,7 @@ def run_migrations_offline():
 def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
-        version_table="{{cookiecutter.project_name}}",
+        version_table="version_table_{{cookiecutter.project_name}}",
         target_metadata=target_metadata,
         include_object=include_object,
     )
