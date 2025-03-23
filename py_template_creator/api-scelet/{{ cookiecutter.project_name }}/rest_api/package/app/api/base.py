@@ -5,9 +5,9 @@ base_router = APIRouter()
 
 @base_router.get("/", tags=["root"])
 async def read_root() -> dict:
-    return {"msg": "Welcome!", "status": "OK"}
+    return {"message": "Welcome!"}
 
 
 @base_router.get("/health", tags=["health"])
 async def health() -> dict:
-    return {"msg": "API is working correctly", "status": "OK"}
+    return {"message": "API is working correctly"}

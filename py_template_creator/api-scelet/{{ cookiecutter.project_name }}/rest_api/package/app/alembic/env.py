@@ -2,8 +2,9 @@ import asyncio
 from logging.config import fileConfig
 
 from alembic import context
+from alembic.script import ScriptDirectory
 from package.app.models.base import Base, DB_URL
-from psycopg.connection_async import AsyncConnection as Connection
+from asyncpg import Connection
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
@@ -17,6 +18,23 @@ fileConfig(config.config_file_name)  # type: ignore
 
 # add your model's MetaData object here
 target_metadata = Base.metadata
+
+
+def process_revision_directives(context, revision, directives):
+    # extract Migration
+    migration_script = directives[0]
+    # extract current head revision
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head()
+
+    if head_revision is None:
+        # edge case with first migration
+        new_rev_id = 1
+    else:
+        # default branch with incrementation
+        last_rev_id = int(head_revision.lstrip("0"))
+        new_rev_id = last_rev_id + 1
+    # fill zeros up to 4 digits: 1 -> 0001
+    migration_script.rev_id = "{0:04}".format(new_rev_id)
 
 
 def include_object(object, name, type_, reflected, compare_to):
@@ -38,10 +56,11 @@ def run_migrations_offline():
     context.configure(
         url=DB_URL,
         target_metadata=target_metadata,
-        version_table="user",
+        version_table="{{cookiecutter.project_name}}_version_table",
         include_object=include_object,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        process_revision_directives=process_revision_directives,
     )
 
     with context.begin_transaction():
@@ -53,7 +72,8 @@ def do_run_migrations(connection: Connection) -> None:
         connection=connection,
         target_metadata=target_metadata,
         include_object=include_object,
-        version_table="{{cookiecutter.project_name}}",
+        version_table="{{cookiecutter.project_name}}_version_table",
+        process_revision_directives=process_revision_directives,
     )
 
     with context.begin_transaction():

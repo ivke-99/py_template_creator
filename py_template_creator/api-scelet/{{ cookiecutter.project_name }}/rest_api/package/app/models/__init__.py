@@ -1,9 +1,4 @@
-# need access to this before importing models
-from .base import Base, sessionmanager, get_db_session
+from .base import Base, get_db_session, close_db_connection
+from .user import UsersModel
 
-
-__all__ = [
-    "Base",
-    "sessionmanager",
-    "get_db_session",
-]
+__all__ = ["Base", "get_db_session", "UsersModel", "close_db_connection"]
