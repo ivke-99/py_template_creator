@@ -6,6 +6,7 @@ services:
   rest_api:
     build:
       context: rest_api
+      target: ${BUILD_TARGET:-prod}
       args:
         - APP_VERSION
     image: ${REGISTRY}/rest_api:${APP_VERSION}

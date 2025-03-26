@@ -11,7 +11,7 @@ run:
 
 test:
 	@echo "Running unit tests..."
-	env POSTGRES_DB=test_db uv run coverage run -m pytest ${module} -m 'not e2e' && \
+	env POSTGRES_DB=test_db uv run coverage run -m pytest ${module} && \
 	uv run coverage html && \
 	uv run coverage report
 	@echo
