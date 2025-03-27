@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
-alembic -c ./package/alembic.ini ensure_version
-alembic -c ./package/alembic.ini upgrade head
+set -e
+
+# Default to "true" if RUN_MIGRATIONS is not set
+RUN_MIGRATIONS=${RUN_MIGRATIONS:-true}
+
+if [ "$RUN_MIGRATIONS" = "true" ]; then
+    ./migrate.sh
+fi
+
 rest_api

@@ -1,8 +1,7 @@
-import contextlib
 import logging
-import os
-import enum
-import uuid
+import datetime as dt
+import contextlib
+from package.app import settings
 from typing import Any, AsyncIterator
 
 from sqlalchemy.ext.asyncio import (
@@ -11,7 +10,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy import inspect, Identity, BigInteger
+
+from sqlalchemy import Identity, BigInteger, func
+from sqlalchemy.schema import MetaData
 from sqlalchemy.orm import (
     DeclarativeBase,
     MappedAsDataclass,
@@ -20,68 +21,61 @@ from sqlalchemy.orm import (
 )
 
 
-class Base(MappedAsDataclass, DeclarativeBase):
+class CreatedMixin(MappedAsDataclass):
+    created_at: Mapped[dt.datetime] = mapped_column(
+        default=None, server_default=func.now(), kw_only=True
+    )
+    # updated_at: Mapped[dt.datetime] = mapped_column(
+    #     default=None,
+    #     server_default=func.now(),
+    #     onupdate=func.now(),
+    #     kw_only=True,
+    # )
+
+
+class IdMixin(MappedAsDataclass):
     id: Mapped[int] = mapped_column(
         BigInteger, Identity(always=True), init=False, primary_key=True
     )
+
+
+class Base(MappedAsDataclass, DeclarativeBase):
+    metadata = MetaData(
+        naming_convention={
+            "ix": "ix_%(column_0_label)s",
+            "uq": "uq_%(table_name)s_%(column_0_name)s",
+            "ck": "ck_%(table_name)s_%(constraint_name)s",
+            "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+            "pk": "pk_%(table_name)s",
+        }
+    )
+
     """subclasses will be converted to dataclasses"""
-
-    def to_dict(self, recurse: bool = True, force_exclude: list = []) -> dict:
-        """Convert an SQLAlchemy model instance to a dictionary."""
-        if not hasattr(self, "__dict__"):
-            return {}
-        # Convert object attributes to dictionary
-        result = {}
-        for key, value in self.__dict__.items():
-            if key != "_sa_instance_state" and key not in force_exclude:
-                if isinstance(value, enum.Enum):
-                    result[key] = value.value
-                elif isinstance(value, uuid.UUID):
-                    result[key] = str(value)
-                else:
-                    result[key] = value
-        # Get relationships from the SQLAlchemy inspection system
-        mapper = inspect(type(self))
-        for relationship in mapper.relationships:
-            if relationship.key not in result:
-                continue
-            value = getattr(self, relationship.key)
-
-            if value is None:
-                result[relationship.key] = None
-            elif isinstance(value, list):
-                if recurse:
-                    result[relationship.key] = [
-                        item.to_dict(recurse=recurse) for item in value
-                    ]
-                else:
-                    result[relationship.key] = [item.id for item in value]
-            else:
-                if recurse:
-                    result[relationship.key] = value.to_dict(recurse=recurse)
-                else:
-                    result[relationship.key] = value.id
-
-        return result
 
 
 logger = logging.getLogger(__name__)
 
-DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
-    os.getenv("POSTGRES_USER"),
-    os.getenv("POSTGRES_PASSWORD"),
-    os.getenv("POSTGRES_HOST"),
-    os.getenv("POSTGRES_PORT"),
-    os.getenv("POSTGRES_DB"),
+DB_URL = "postgresql+asyncpg://{}:{}@{}:{}/{}".format(
+    settings.POSTGRES_USER,
+    settings.POSTGRES_PASSWORD,
+    settings.POSTGRES_HOST,
+    settings.POSTGRES_PORT,
+    settings.POSTGRES_DB,
 )
 logger.info(f"Connecting with conn string {DB_URL}")
 
 
 class DatabaseSessionManager:
-    def __init__(self, host: str, engine_kwargs: dict[str, Any] = {}):
-        self._engine = create_async_engine(host, **engine_kwargs)
+    def __init__(self, host: str = DB_URL, engine_kwargs: dict[str, Any] = {}):
+        self._engine = create_async_engine(
+            host,
+            **engine_kwargs,
+        )
         self._sessionmaker = async_sessionmaker(
-            autocommit=False, expire_on_commit=False, bind=self._engine
+            autocommit=False,
+            expire_on_commit=False,
+            autoflush=True,
+            bind=self._engine,
         )
 
     async def close(self):
@@ -119,9 +113,22 @@ class DatabaseSessionManager:
             await session.close()
 
 
-sessionmanager = DatabaseSessionManager(DB_URL)
+sessionmanager = DatabaseSessionManager(
+    DB_URL,
+    {
+        "pool_pre_ping": True,
+        "pool_size": settings.POOL_SIZE,
+        "pool_recycle": 3600,
+        "echo": False,
+    },
+)
 
 
-async def get_db_session():
+async def get_db_session() -> AsyncSession:
     async with sessionmanager.session() as session:
         yield session
+
+
+async def close_db_connection():
+    if sessionmanager._engine is not None:
+        await sessionmanager.close()

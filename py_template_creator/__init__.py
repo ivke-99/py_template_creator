@@ -2,4 +2,4 @@
 Generate your python project template with ease.
 """
 
-__version__ = "1.5.0"
+__version__ = "3.0.0"

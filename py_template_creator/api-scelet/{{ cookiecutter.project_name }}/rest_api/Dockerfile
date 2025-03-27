@@ -1,38 +1,55 @@
-ARG PYTHON_VERSION=3.12-slim
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
 
-# Stage 0, instaling dev packages
-FROM python:${PYTHON_VERSION} as builder
-LABEL maintainer="{{cookiecutter.author_name}} <{{cookiecutter.author_email}}>"
-ENV PYTHONUNBUFFERED 1
+# Stage 1
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy PYTHONUNBUFFERED=1
 
-RUN apt-get update && apt-get -y install build-essential libpq-dev
-WORKDIR /wheels
-COPY ./requirements/ /wheels/requirements/
-RUN pip install -U pip && pip wheel -r ./requirements/prod.txt
-
-# Stage 1, no dev packages on wheels
-FROM python:${PYTHON_VERSION}
-ENV PYTHONUNBUFFERED=1
-
-COPY --from=builder /wheels /wheels
-RUN pip install -U pip \
-       && pip install -r /wheels/requirements/prod.txt \
-                      -f /wheels \
-       && rm -rf /wheels \
-       && rm -rf /root/.cache/pip/*
-
-
-# Copy code to docker
 WORKDIR /opt/app
 
-COPY ./ /opt/app/
-COPY ./config /opt/app/config
+COPY uv.lock .
+COPY pyproject.toml .
 
-# Ensuring script permissions
-RUN chmod +x /opt/app/config/run.sh
-RUN chmod +x /opt/app/config/test.sh
+RUN uv sync --frozen --no-install-project --no-dev --no-editable --no-cache
 
-RUN pip install -e .
+COPY package/app /opt/app/package/app
+COPY package/tests /opt/app/package/tests
+COPY package/assets /opt/app/package/assets
+COPY package/alembic.ini /opt/app/package/alembic.ini
+COPY package/__init__.py /opt/app/package/__init__.py
+COPY README.md /opt/app/README.md
 
-# Specify the command to run when the image is run.
-CMD "/opt/app/config/run.sh"
+RUN uv sync --frozen --no-dev --no-editable --no-cache
+
+COPY ./config/test.sh test.sh
+
+ENV PATH="/opt/app/.venv/bin:$PATH"
+
+# Use this entrypoint for running tests in docker
+# This stage uses UV so you can install packages while running tests
+# It can be split into two docker images, but i dont like that
+CMD ["/opt/app/test.sh"]
+
+# Final stage
+FROM python:3.13 AS prod
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /opt/app
+
+COPY --from=builder /opt/app/.venv .venv
+COPY --from=builder /opt/app/package/app/alembic/ ./package/app/alembic/
+COPY --from=builder /opt/app/package/alembic.ini alembic.ini
+
+COPY ./config/run.sh run.sh
+COPY ./config/migrate.sh migrate.sh
+
+ENV PATH="/opt/app/.venv/bin:$PATH"
+
+# This is not really needed, but it's a good practice to create a non-root user
+# and change ownership of the working directory to that user.
+# This is because the default user in the python:3.13 image is root.
+RUN useradd -m user \
+&& chown -R user . \
+&& chmod -R 775 .
+USER user
+
+#Use this for running the normal app
+CMD ["/opt/app/run.sh"]
