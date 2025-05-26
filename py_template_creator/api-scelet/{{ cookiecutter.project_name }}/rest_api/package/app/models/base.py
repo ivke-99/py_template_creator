@@ -1,5 +1,4 @@
 import logging
-import datetime as dt
 import contextlib
 from package.app import settings
 from typing import Any, AsyncIterator
@@ -11,32 +10,11 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from sqlalchemy import Identity, BigInteger, func
 from sqlalchemy.schema import MetaData
 from sqlalchemy.orm import (
     DeclarativeBase,
     MappedAsDataclass,
-    Mapped,
-    mapped_column,
 )
-
-
-class CreatedMixin(MappedAsDataclass):
-    created_at: Mapped[dt.datetime] = mapped_column(
-        default=None, server_default=func.now(), kw_only=True
-    )
-    # updated_at: Mapped[dt.datetime] = mapped_column(
-    #     default=None,
-    #     server_default=func.now(),
-    #     onupdate=func.now(),
-    #     kw_only=True,
-    # )
-
-
-class IdMixin(MappedAsDataclass):
-    id: Mapped[int] = mapped_column(
-        BigInteger, Identity(always=True), init=False, primary_key=True
-    )
 
 
 class Base(MappedAsDataclass, DeclarativeBase):

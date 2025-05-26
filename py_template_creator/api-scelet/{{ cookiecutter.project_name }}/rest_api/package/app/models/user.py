@@ -3,8 +3,9 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils.types.password import PasswordType
 from sqlalchemy_utils import EmailType
-from .base import Base, IdMixin, CreatedMixin
+from .base import Base
 from sqlalchemy_utils import force_auto_coercion
+from mrkutil.utilities.sqlalchemy_mixins import IdMixin, CreatedMixin
 
 import logging
 
