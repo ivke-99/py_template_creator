@@ -6,7 +6,7 @@ description = "Service python application"
 readme = "README.md"
 authors = [{ name = "{{ cookiecutter.author_name }}", email = "{{ cookiecutter.author_email }}" }]
 dependencies = [
-    "mrkutil==2.0.2",
+    "mrkutil==2.1.0",
     "sqlalchemy==2.0.41",
     "sqlalchemy-utils==0.41.2",
     "alembic==1.16.1",

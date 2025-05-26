@@ -11,7 +11,7 @@ dependencies = [
     "fastapi[standard]==0.115.12",
     "pydantic[email]==2.11.5",
     "pydantic_extra_types==2.10.4",
-    "mrkutil==2.0.2",
+    "mrkutil==2.1.0",
     "redis==6.1.0",
     "assetsstore[minio,s3]==1.7.2",
     "sqlalchemy==2.0.41",
