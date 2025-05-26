@@ -1,55 +1,54 @@
-# {{ cookiecutter.project_name }} service
+# {{ cookiecutter.project_name }}
 
-## Setup service
+This document provides steps to set up, start, and test the **{{ cookiecutter.project_name }}**.
 
-- create virtualenv with virtualenv wrapper
-```
-cd {{ cookiecutter.project_name }}
-mkvirtualenv <env name> --python=/path/to/python/executable/python3.12.*
-```
+## **Setup Service**
 
-- install packages needed for the project
-```
-make env
-```
+1. Navigate to the `{{ cookiecutter.project_name }}` directory:
+   ```bash
+   cd {{ cookiecutter.project_name }}
+   ```
 
+2. Install the required packages for the project:
+   ```bash
+   make env
+   ```
 
-## Start service
+---
 
-- stop docker container for this service
-```
-cd <project root>
-docker-compose stop {{ cookiecutter.project_name }}
-```
+## **Start Service**
 
-- start service from virtual environment
-```
-cd {{ cookiecutter.project_name }}
-workon <env name>
-make run
-```
+1. **Stop Docker Container for This Service**  
+   Ensure the Docker container for the {{ cookiecutter.project_name }} is stopped:
+   ```bash
+   cd <project root>
+   docker-compose stop {{ cookiecutter.project_name }}
+   ```
 
+2. **Start the Service in the Virtual Environment**  
+   Run the service locally:
+   ```bash
+   cd {{ cookiecutter.project_name }}
+   make run
+   ```
 
-## Run tests
+---
 
-- tests are run on virtual environment
-```
-cd {{ cookiecutter.project_name }}
-workon <env name>
-```
+## **Run Tests**
 
-- run all tests
-```
-make test
-```
+1. Run all tests:
+   ```bash
+   make test
+   ```
 
-- run all tests in single file
-```
-make test module="--addopts package/tests/test_health.py"
-```
+2. Run all tests in a specific file:
+   ```bash
+   make test module="package/tests/test_health.py"
+   ```
 
-- run single test in specific file
-```
-make test module="--addopts package/tests/test_health.py::HealthTest::test_health"
-```
+3. Run a single test in a specific file:
+   ```bash
+   make test module="package/tests/test_health.py::HealthTest::test_health"
+   ```
 
+---

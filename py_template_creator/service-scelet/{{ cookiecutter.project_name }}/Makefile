@@ -3,48 +3,51 @@ include ../.env
 export
 
 env:
-	pip install -r requirements/local.txt  > /dev/null
+	uv sync --all-extras
 
 run:
 	@echo "Running service..."
-	python package/run.py
+	uv run package/run.py
 
 test:
 	@echo "Running unit tests..."
-	env POSTGRES_DB=test_db coverage run -m pytest ${module} && \
-	coverage html && \
-	coverage report
+	env POSTGRES_DB=test_db uv run coverage run -m pytest ${module} && \
+	uv run coverage html && \
+	uv run coverage report
 	@echo
-	@echo "Flake8 errors in code ----------------"
+	@echo "Ruff errors in code ----------------"
 	@echo
 	@echo "--------------------------------------"
-	@python -m flake8 --max-line-length=88 --exclude .git,__pycache__,.eggs,build
-	@echo "OK, no flake8 errors in code"
+	uvx ruff check
+	@echo "OK, no ruff errors in code"
 	@echo "--------------------------------------"
 
 lint:
-	@python -m flake8 --max-line-length=88 --exclude .git,__pycache__,.eggs,build
+	uvx ruff check
 
 migrations:
 	@echo "Generating migrations ..."
-	alembic -c ./package/alembic.ini revision --autogenerate -m "${message}"
+	uv run alembic -c ./package/alembic.ini revision --autogenerate -m "${message}"
 
 migrate:
 	@echo "Running migrations ..."
-	alembic -c ./package/alembic.ini upgrade head
+	uv run alembic -c ./package/alembic.ini upgrade head
 	@echo "Migrations finished."
+
+shell:
+	uv run python package/shell.py
 
 downgrade:
 	@echo "Running downgrade ..."
-	alembic -c ./package/alembic.ini downgrade ${level}
+	uv run alembic -c ./package/alembic.ini downgrade ${level}
 	@echo "Migrations finished."
 
 init_db:
 	@echo "Initing database ..."
-	alembic -c ./package/alembic.ini ensure_version
+	uv run alembic -c ./package/alembic.ini ensure_version
 	@echo "Migrations finished."
 
 check_db:
 	@echo "Checking migrations ..."
-	alembic -c ./package/alembic.ini check
+	uv run alembic -c ./package/alembic.ini check
 	@echo "Migrations finished."

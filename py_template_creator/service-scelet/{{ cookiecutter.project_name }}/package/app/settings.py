@@ -13,3 +13,4 @@ class settings:
     POSTGRES_HOST = os.getenv("POSTGRES_HOST")
     POSTGRES_PORT = os.getenv("POSTGRES_PORT")
     POSTGRES_DB = os.getenv("POSTGRES_DB")
+    MAX_THREADS = int(os.getenv("MAX_THREADS", 10))

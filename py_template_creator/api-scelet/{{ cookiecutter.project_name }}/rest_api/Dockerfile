@@ -12,7 +12,7 @@ RUN uv sync --frozen --no-install-project --no-dev --no-editable --no-cache
 
 COPY package/app /opt/app/package/app
 COPY package/tests /opt/app/package/tests
-COPY package/assets /opt/app/package/assets
+COPY assets /opt/app/package/assets
 COPY package/alembic.ini /opt/app/package/alembic.ini
 COPY package/__init__.py /opt/app/package/__init__.py
 COPY README.md /opt/app/README.md

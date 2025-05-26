@@ -1,61 +1,48 @@
 import logging
-import enum
-import uuid
-
+import datetime as dt
 from package.app import settings
-from sqlalchemy import create_engine, NullPool, inspect, Identity, BigInteger
+from sqlalchemy import create_engine, Identity, BigInteger, func
+from sqlalchemy.schema import MetaData
 from sqlalchemy.orm import (
     DeclarativeBase,
     sessionmaker,
     MappedAsDataclass,
     Mapped,
     mapped_column,
+    scoped_session,
 )
 
 
-class Base(MappedAsDataclass, DeclarativeBase):
+class CreatedMixin(MappedAsDataclass):
+    created_at: Mapped[dt.datetime] = mapped_column(
+        default=None, server_default=func.now(), kw_only=True
+    )
+    # updated_at: Mapped[dt.datetime] = mapped_column(
+    #     default=None,
+    #     server_default=func.now(),
+    #     onupdate=func.now(),
+    #     kw_only=True,
+    # )
+
+
+class IdMixin(MappedAsDataclass):
     id: Mapped[int] = mapped_column(
         BigInteger, Identity(always=True), init=False, primary_key=True
     )
+
+
+class Base(MappedAsDataclass, DeclarativeBase):
+    metadata = MetaData(
+        naming_convention={
+            "ix": "ix_%(column_0_label)s",
+            "uq": "uq_%(table_name)s_%(column_0_name)s",
+            "ck": "ck_%(table_name)s_%(constraint_name)s",
+            "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+            "pk": "pk_%(table_name)s",
+        }
+    )
+
     """subclasses will be converted to dataclasses"""
-
-    def to_dict(self, recurse: bool = True, force_exclude: list = []) -> dict:
-        """Convert an SQLAlchemy model instance to a dictionary."""
-        if not hasattr(self, "__dict__"):
-            return {}
-        # Convert object attributes to dictionary
-        result = {}
-        for key, value in self.__dict__.items():
-            if key != "_sa_instance_state" and key not in force_exclude:
-                if isinstance(value, enum.Enum):
-                    result[key] = value.value
-                elif isinstance(value, uuid.UUID):
-                    result[key] = str(value)
-                else:
-                    result[key] = value
-        # Get relationships from the SQLAlchemy inspection system
-        mapper = inspect(type(self))
-        for relationship in mapper.relationships:
-            if relationship.key not in result:
-                continue
-            value = getattr(self, relationship.key)
-
-            if value is None:
-                result[relationship.key] = None
-            elif isinstance(value, list):
-                if recurse:
-                    result[relationship.key] = [
-                        item.to_dict(recurse=recurse) for item in value
-                    ]
-                else:
-                    result[relationship.key] = [item.id for item in value]
-            else:
-                if recurse:
-                    result[relationship.key] = value.to_dict(recurse=recurse)
-                else:
-                    result[relationship.key] = value.id
-
-        return result
 
 
 logger = logging.getLogger(__name__)
@@ -70,13 +57,12 @@ DB_URL = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
 logger.info(f"Connecting with conn string {DB_URL}")
 
 
-engine = create_engine(DB_URL, pool_pre_ping=True, poolclass=NullPool)
-Session = sessionmaker(autocommit=False, autoflush=True, bind=engine)
-
-
-def get_db_session():
-    try:
-        db = Session()
-        yield db
-    finally:
-        db.close()
+engine = create_engine(
+    DB_URL,
+    pool_pre_ping=True,
+    pool_size=settings.MAX_THREADS,
+    pool_recycle=3600,
+    echo=False,
+)
+session_maker = sessionmaker(autocommit=False, autoflush=True, bind=engine)
+Session = scoped_session(session_maker)

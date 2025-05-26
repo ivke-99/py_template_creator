@@ -9,7 +9,7 @@ from sqlalchemy.pool import NullPool
 from sqlalchemy import text, create_engine, inspect
 from sqlalchemy.orm import close_all_sessions
 from package.app import settings
-from package.app.models import Base
+from package.app.models import Base, Session
 from package.app.models.base import DB_URL
 
 
@@ -89,3 +89,9 @@ def drop_tables():
         poolclass=NullPool,
     )  # connect to server
     truncate_all_tables(my_engine)
+
+
+@pytest.fixture(scope="function")
+def db():
+    yield Session()
+    Session.close()

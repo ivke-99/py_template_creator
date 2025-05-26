@@ -19,7 +19,7 @@ class UsersModel(IdMixin, CreatedMixin, Base):
     email: Mapped[str] = mapped_column(EmailType, unique=True)
     phone: Mapped[str] = mapped_column(unique=True)
     password: Mapped[Optional[str]] = mapped_column(
-        PasswordType(schemes=["bcrypt"]), unique=False, default=None
+        PasswordType(schemes=["pbkdf2_sha512"]), unique=False, default=None
     )
     is_email_verified: Mapped[bool] = mapped_column(default=False)
     is_phone_verified: Mapped[bool] = mapped_column(default=False)

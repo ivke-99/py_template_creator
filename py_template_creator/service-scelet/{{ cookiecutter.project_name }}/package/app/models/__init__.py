@@ -1,8 +1,8 @@
 # need access to this before importing models
-from .base import Base, get_db_session
+from .base import Base, Session
 
 
 __all__ = [
     "Base",
-    "get_db_session",
+    "Session",
 ]
